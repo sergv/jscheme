@@ -14,6 +14,23 @@ public class Evaluator implements java.io.Serializable {
     return this.exit = exit;
   }
 
+  /* special exception for interrupts */
+  public static class InterruptedException extends JschemeThrowable {
+      InterruptedException(Object contents) {
+          super(contents);
+      }
+
+      InterruptedException(String msg, Object contents) {
+          super(msg, contents);
+      }
+
+      @Override
+      public String toString(){
+      return ("InterruptedException:[[" + U.stringify(this.getMessage(), false) +
+              "," + U.stringify(contents, false)) + "]]";
+      }
+  }
+
   private transient InputPort   input  = new InputPort(System.in);
   public void setInput(InputPort ip) { this.input = ip; }
   public InputPort getInput() { return this.input; }
@@ -37,7 +54,7 @@ public class Evaluator implements java.io.Serializable {
   public void interruptCheck() {
     if (INTERRUPTABLE && Thread.currentThread().interrupted()) {
       INTERRUPTABLE = false;
-      throw new JschemeThrowable("Execution was interrupted.");
+      throw new InterruptedException("Execution was interrupted.");
     }
   }
   // The default environment for doing work.

@@ -23,7 +23,7 @@ import java.util.Iterator;
    "-Dbootstrap.path=.,.".  For each class,src pair, a new
    CompilingClassLoader is constructed and chained to previous ones.
    <p>
-   
+
    <h3>Sample Usage:</h3>
 
    Supose we have a Java application, app, with the following files and
@@ -42,9 +42,9 @@ import java.util.Iterator;
    javac -classpath app;jdk/lib/tools.jar -d app
          app/build/CompilingClassLoader.java
 
-   java -Dbootstrap.path=app/classlib,app/src 
+   java -Dbootstrap.path=app/classlib,app/src
         -classpath app;jdk/lib/tools.jar
-	CompilingClassLoader app.Main
+    CompilingClassLoader app.Main
    </pre>
 
    The -classpath must provide access to CompilingClassLoader and
@@ -58,50 +58,58 @@ import java.util.Iterator;
  **/
 public class CompilingClassLoader extends LoadletClassLoader {
 
-  public CompilingClassLoader(ClassLoader parent, Loadlet loadlet) {
-    super(parent, loadlet); }
-
-  private static Iterator crack(final String s, final char separator) {
-    return new Iterator() {
-	int start = 0;
-
-	public boolean hasNext() { return start < s.length(); }
-
-	public Object next() {
-	  int end = s.indexOf(separator, start);
-	  end = (end == -1) ? s.length() : end;
-	  String result = s.substring(start, end);
-	  start = end + 1;
-	  return result; }
-
-	public void remove() {}}; }
-
-  /**
-     Start your Java application through this main() as described
-     above to get automatic compiling behavior.
-  **/
-  public static void main(String[] args) {
-    try {
-      Iterator paths = crack(System.getProperty("bootstrap.path", ".,."), ',');
-      Loadlet loadlet = null; 
-      while (paths.hasNext()) {
-	String bin = (String) paths.next();
-	if (paths.hasNext()) {
-	  String src = (String) paths.next();
-	  loadlet = new CompilingLoadlet(loadlet, bin, src);
-	} else break;
-      }
-      ClassLoader loader = new CompilingClassLoader
-	(CompilingClassLoader.class.getClassLoader(), loadlet);
-      Class c = loader.loadClass(args[0]);
-      Class[] types = new Class[] { String[].class};
-      Method m = c.getMethod("main", types);
-      int n = 1;
-      String[] newArgs = new String[args.length - n];
-      for (int i = 0; i < newArgs.length; i++)
-	newArgs[i] = args[i+n];
-      Object[] parameters = new Object[] { newArgs };
-      m.invoke(null, parameters);
-    } catch (Exception e) {
-      e.printStackTrace(); }}
+public CompilingClassLoader(ClassLoader parent, Loadlet loadlet) {
+    super(parent, loadlet);
 }
+
+private static Iterator crack(final String s, final char separator) {
+    return new Iterator() {
+        int start = 0;
+
+        public boolean hasNext() { return start < s.length(); }
+
+        public Object next() {
+            int end = s.indexOf(separator, start);
+            end = (end == -1) ? s.length() : end;
+            String result = s.substring(start, end);
+            start = end + 1;
+            return result;
+        }
+
+        public void remove() {}
+    };
+}
+
+/**
+   Start your Java application through this main() as described
+   above to get automatic compiling behavior.
+**/
+public static void main(String[] args) {
+    try {
+        Iterator paths = crack(System.getProperty("bootstrap.path", ".,."), ',');
+        Loadlet loadlet = null;
+        while (paths.hasNext()) {
+            String bin = (String) paths.next();
+            if (paths.hasNext()) {
+                String src = (String) paths.next();
+                loadlet = new CompilingLoadlet(loadlet, bin, src);
+            } else { break; }
+        }
+        ClassLoader loader = new CompilingClassLoader
+        (CompilingClassLoader.class.getClassLoader(), loadlet);
+        Class c = loader.loadClass(args[0]);
+        Class[] types = new Class[] { String[].class};
+        Method m = c.getMethod("main", types);
+        int n = 1;
+        String[] newArgs = new String[args.length - n];
+        for (int i = 0; i < newArgs.length; i++) {
+            newArgs[i] = args[i + n];
+        }
+        Object[] parameters = new Object[] { newArgs };
+        m.invoke(null, parameters);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+}
+

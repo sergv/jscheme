@@ -8,8 +8,9 @@ package jscheme;
  **/
 public interface SchemeProcedure extends Runnable, java.io.Serializable {
 
-  public void run();
-  public abstract Object apply(Object[] args);
-  public Object apply(SchemePair args);
+public void run();
+public abstract Object apply(Object[] args);
+public Object apply(SchemePair args);
 
 }
+

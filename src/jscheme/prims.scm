@@ -10,7 +10,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; first we replace the current Scheme environment with an empty environment
-;; so that the only symbols that are defined are 
+;; so that the only symbols that are defined are
 ;;
 ;;  * the javadot symbols
 ;;    constructors, instance/static methods, instance/static fields, classes, and
@@ -31,9 +31,9 @@
 ;; Now we define define and define-macro, and
 ;; to do this we define a few helper procedures first ...
 
-(set! set-procedure-name! 
+(set! set-procedure-name!
   (lambda(proc name)
-    (.setName proc name) 
+    (.setName proc name)
      proc))
 
 (set! list (lambda R R))
@@ -51,27 +51,27 @@
         (list 'set! (first var)
               (list 'set-procedure-name!
                     (cons 'lambda (cons (rest var) body))
-		    (list 'quote (first var))))
+                    (list 'quote (first var))))
         (cons 'set! (cons var body))))
    'define))
 
 (set! define-macro
- (set-procedure-name! 
-   (macro (spec . body) 
+ (set-procedure-name!
+   (macro (spec . body)
      (if (pair? spec)
-	 (list 'define (first spec)
-	    (list 'set-procedure-name! 
+         (list 'define (first spec)
+            (list 'set-procedure-name!
                  (cons 'macro (cons (rest spec)  body))
-		 (list 'quote (first spec))))
-	 (list 'define spec
-	    (list 'set-procedure-name! 
+                 (list 'quote (first spec))))
+         (list 'define spec
+            (list 'set-procedure-name!
                  (cons 'macro (cons (second (first body)) (rest (rest (first body)))))
-	     (list 'quote spec)))))
+             (list 'quote spec)))))
    'define-macro
 ))
-       
 
-(set! set-name! (lambda(name proc) 
+
+(set! set-name! (lambda(name proc)
   (if (.isInstance Procedure.class proc) (.setName proc name)) proc))
 
 
@@ -91,7 +91,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(define (null? x) 
+(define (null? x)
    (jsint.Op.sameObject x jsint.Pair.EMPTY$))
 (define (not x) (.equals #f x))
 (define (pair? p) (if (null? p) #f (.isInstance Pair.class p)))
@@ -113,15 +113,15 @@
 (define (set-cdr! L v) (.rest$ L v))
 
 
-; these could be optimized, e.g. 
-; cadr=.second     caddr=.third    
+; these could be optimized, e.g.
+; cadr=.second     caddr=.third
 ; (caadr x)= (car (.second x)), (cadadr x) =(.second (.second x))
 ;
 
 (define (caar L) (car (car L)))
 (define (cadr L) (car (cdr L))) ;; .second
 (define (cdar L) (cdr (car L)))
-(define (cddr L) (cdr (cdr L))) 
+(define (cddr L) (cdr (cdr L)))
 
 (define (caaar L) (car (car (car L))))
 (define (caadr L) (car (car (cdr L))))
@@ -198,17 +198,17 @@
 (define-macro (and . args)
     (if (null? args)
          #t
-	 (if (null? (rest args)) 
+         (if (null? (rest args))
              (first args)
-	     (list 'if (first args) (cons 'and (rest args)) #f))))
+             (list 'if (first args) (cons 'and (rest args)) #f))))
 
 ;; here we define eq? to hold for all scalar quantities
-(define (eq? x y) 
-  (or 
-     (Op.sameObject x y) 
-     (and (or (.isInstance java.lang.Character.class x) 
-              (.isInstance java.lang.Boolean.class x) 
-              (.isInstance java.lang.Number.class x) 
+(define (eq? x y)
+  (or
+     (Op.sameObject x y)
+     (and (or (.isInstance java.lang.Character.class x)
+              (.isInstance java.lang.Boolean.class x)
+              (.isInstance java.lang.Number.class x)
             )
          (.equals x y))))
 
@@ -220,8 +220,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (equal? x y)
-  (define (eqpair? x y)                  
-     (and (equal? (first x) (first y)) 
+  (define (eqpair? x y)
+     (and (equal? (first x) (first y))
           (equal? (rest x) (rest y))))
   (define (eqarray? x y)
      (and (eqv? (java.lang.reflect.Array.getLength x) (java.lang.reflect.Array.getLength y))
@@ -233,31 +233,31 @@
          #f)))
   (if (eqv? x y)
        #t
-    (if (and (pair? x) (pair? y)) 
+    (if (and (pair? x) (pair? y))
         (eqpair? x y)
       (if (and (.isArray (.getClass x)) (.isArray (.getClass y)))
           (eqarray? x y)
           #f))))
-         
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; membership
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (memq x L)
-  (if (or (null? L) (not(pair? L))) 
+  (if (or (null? L) (not(pair? L)))
       #f
       (if (eq? x (first L))
            L
           (memq x (cdr L)))))
 (define (memv x L)
-  (if (or (null? L) (not(pair? L))) 
+  (if (or (null? L) (not(pair? L)))
       #f
       (if (eqv? x (first L))
            L
           (memv x (cdr L)))))
 (define (member x L)
-  (if (or (null? L) (not(pair? L))) 
+  (if (or (null? L) (not(pair? L)))
       #f
       (if (equal? x (first L))
            L
@@ -273,12 +273,12 @@
           (if (null? (rest clause)) ;; (test)
               (list 'or (first clause) else-part)
               (if (eq? (second clause) '=>) ;; (test => proc)
-                  (list (list 'lambda '(<_>) 
+                  (list (list 'lambda '(<_>)
                          (list 'if '<_> (list (third clause) '<_>) else-part))
                         (first clause))
                   (if (member (first clause) '(#t else)) ;; (else x y z)
                       (cons 'begin (rest clause))
-                      (list 'if (first clause) (cons 'begin (rest clause)) 
+                      (list 'if (first clause) (cons 'begin (rest clause))
                             else-part))))))
     ;; body of cond
     (if (null? clauses)
@@ -316,14 +316,14 @@
 ; hence it evaluates terms in "this" local environment
 ; We haven't defined let yet, hence the ugly code...
 
-(define eval 
+(define eval
  ((lambda(js)
      (lambda R (.apply .eval (cons js R)))
     )
   (jsint.Scheme.currentEvaluator)
  )
 )
-   
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The quasiquote, and a few others, are from Darius Bacon <djello@well.com>
@@ -334,50 +334,50 @@
       (if (pair? exp) (eq? (car exp) 'quote) (not (symbol? exp))))
     (define (combine-skeletons left right exp)
       (cond
-       ((and (constant? left) (constant? right)) 
-	(if (and (eqv? (eval left) (car exp))
-		 (eqv? (eval right) (cdr exp)))
-	    (list 'quote exp)
-	    (list 'quote (cons (eval left) (eval right)))))
+       ((and (constant? left) (constant? right))
+        (if (and (eqv? (eval left) (car exp))
+                 (eqv? (eval right) (cdr exp)))
+            (list 'quote exp)
+            (list 'quote (cons (eval left) (eval right)))))
        ((null? right) (list 'list left))
        ((and (pair? right) (eq? (car right) 'list))
-	(cons 'list (cons left (cdr right))))
+        (cons 'list (cons left (cdr right))))
        (else (list 'cons left right))))
     (define (expand-quasiquote exp nesting)
       (cond
        ((vector? exp)
-	(list 'apply 'vector (expand-quasiquote (vector->list exp) nesting)))
-       ((not (pair? exp)) 
-	(if (constant? exp) exp (list 'quote exp)))
+        (list 'apply 'vector (expand-quasiquote (vector->list exp) nesting)))
+       ((not (pair? exp))
+        (if (constant? exp) exp (list 'quote exp)))
        ((and (eq? (car exp) 'unquote) (eqv? (length exp) 2))
-	(if (eqv? nesting 0)
-	    (second exp)
-	    (combine-skeletons ''unquote 
-			       (expand-quasiquote (cdr exp) (- nesting 1))
-			       exp)))
+        (if (eqv? nesting 0)
+            (second exp)
+            (combine-skeletons ''unquote
+                               (expand-quasiquote (cdr exp) (- nesting 1))
+                               exp)))
        ((and (eq? (car exp) 'quasiquote) (eqv? (length exp) 2))
-	(combine-skeletons ''quasiquote 
-			   (expand-quasiquote (cdr exp) (+ nesting 1))
-			   exp))
+        (combine-skeletons ''quasiquote
+                           (expand-quasiquote (cdr exp) (+ nesting 1))
+                           exp))
        ((and (pair? (car exp))
-	     (eq? (caar exp) 'unquote-splicing)
-	     (eqv? (length (car exp)) 2))
-	(if (eqv? nesting 0)
-	    (list 'append (second (first exp))
-		  (expand-quasiquote (cdr exp) nesting))
-	    (combine-skeletons (expand-quasiquote (car exp) (- nesting 1))
-			       (expand-quasiquote (cdr exp) nesting)
-			       exp)))
+             (eq? (caar exp) 'unquote-splicing)
+             (eqv? (length (car exp)) 2))
+        (if (eqv? nesting 0)
+            (list 'append (second (first exp))
+                  (expand-quasiquote (cdr exp) nesting))
+            (combine-skeletons (expand-quasiquote (car exp) (- nesting 1))
+                               (expand-quasiquote (cdr exp) nesting)
+                               exp)))
        (else (combine-skeletons (expand-quasiquote (car exp) nesting)
-				(expand-quasiquote (cdr exp) nesting)
-				exp))))
+                                (expand-quasiquote (cdr exp) nesting)
+                                exp))))
     (expand-quasiquote x 0))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define (apply x y) (.apply x y))
 
-(define map 
+(define map
   (lambda (F . Lists)
     (define (firsts L) (if (null? L) () (cons (first (first L)) (firsts (rest L)))))
     (define (rests L) (if (null? L) () (cons (rest  (first L)) (rests  (rest L)))))
@@ -391,7 +391,7 @@
     (define (rests L) (if (null? L) () (cons (rest  (first L)) (rests  (rest L)))))
     (if (null? (first Lists)) ()
         (begin
-           (apply F (firsts Lists)) 
+           (apply F (firsts Lists))
            (apply for-each (cons F (rests Lists)))))))
 
 
@@ -401,70 +401,72 @@
 
 
 (define-macro (let bindings . body)
-    (define (varval v) (jsint.Symbol.intern (.concat (.toString v) "=")))
+    (define (varval v)
+      ;; (string->symbol (string-append (symbol->string v) "="))
+      (jsint.Symbol.intern (.concat (.toString v) "=")))
     (define (named-let name bindings body)
-       ((lambda (new-bindings)		; Can't use let yet!
-	 `(let ,(cons `(,name #f) new-bindings)
-	    (set! ,name (lambda ,(map first bindings) . ,body))
-	    (,name . ,(map car  new-bindings))))
-	(map (lambda (b) `(,(varval (car b)) ,(cadr b))) bindings)))
-    (if (symbol? bindings) 
-	(named-let bindings (first body) (rest body))
-	`((lambda ,(map first bindings) . ,body) . ,(map second bindings))))
+       ((lambda (new-bindings)                ; Can't use let yet!
+         `(let ,(cons `(,name #f) new-bindings)
+            (set! ,name (lambda ,(map first bindings) . ,body))
+            (,name . ,(map car new-bindings))))
+        (map (lambda (b) `(,(varval (car b)) ,(cadr b))) bindings)))
+    (if (symbol? bindings)
+        (named-let bindings (first body) (rest body))
+        `((lambda ,(map first bindings) . ,body) . ,(map second bindings))))
 
 (define-macro (let* bindings . body )
      (if (null? bindings) (jsint.Scheme.toBody body)
-	 (if (null? (cdr bindings))
-	     `(let (,(first bindings)) . ,body)
-	     `(let (,(first bindings))
-		(let* ,(rest bindings) . ,body)))))
+         (if (null? (cdr bindings))
+             `(let (,(first bindings)) . ,body)
+             `(let (,(first bindings))
+                (let* ,(rest bindings) . ,body)))))
 
 (define-macro (letrec bindings . body)
     (let ((vars (map first bindings))
-	  (vals (map second bindings)))
+          (vals (map second bindings)))
     `(let ,(map (lambda (var) `(,var #f)) vars)
        ,@(map (lambda (var val) `(set! ,var ,val)) vars vals)
        ,(jsint.Scheme.toBody body))))
-    
+
 (define-macro (case exp . cases)
     (define (do-case case)
       (cond ((not (pair? case)) (error '(bad syntax in case:) case))
-	    ((eq? (first case) 'else) case)
-	    (else `((member <exp> ',(first case)) . ,(rest case)))))
+            ((eq? (first case) 'else) case)
+            (else `((member <exp> ',(first case)) . ,(rest case)))))
     `(let ((<exp> ,exp)) (cond . ,(map do-case cases))))
 
 (define-macro (do bindings test-and-result . body)
     (let ((variables (map first bindings))
-	  (inits (map second bindings))
-	  (steps (map (lambda (clause)
-			(if (null? (cddr clause))
-			    (first clause)   
-			    (third clause)))
-		      bindings))
-	  (result (if (null? (cdr test-and-result)) ''unspecified
-		      `(begin . ,(cdr test-and-result)))))
+          (inits (map second bindings))
+          (steps (map (lambda (clause)
+                        (if (null? (cddr clause))
+                            (first clause)
+                            (third clause)))
+                      bindings))
+          (result (if (null? (cdr test-and-result)) ''unspecified
+                      `(begin . ,(cdr test-and-result)))))
       `(letrec ((<loop>
-		 (lambda ,variables
-		   (if ,(first test-and-result)
-		       ,result
-		       (begin 
-			 ,@body
-			 (<loop> . ,steps))))))
-	 (<loop> . ,inits))))
+                 (lambda ,variables
+                   (if ,(first test-and-result)
+                       ,result
+                       (begin
+                         ,@body
+                         (<loop> . ,steps))))))
+         (<loop> . ,inits))))
 
 (define-macro (delay . exp)
     (define (make-promise proc)
       (let ((result-ready? #f)
-	    (result #f))
-	(lambda ()
-	  (if result-ready?
-	      result
-	      (let ((x (proc)))
-		(if result-ready?
-		    result
-		    (begin (set! result-ready? #t)
-			   (set! result x)
-			   result)))))))
+            (result #f))
+        (lambda ()
+          (if result-ready?
+              result
+              (let ((x (proc)))
+                (if result-ready?
+                    result
+                    (begin (set! result-ready? #t)
+                           (set! result x)
+                           result)))))))
     `(,make-promise (lambda () ,exp)))
 
 
@@ -491,12 +493,12 @@
 
 (define (/ a b)  (Op.div a b))
 
-(define max 
+(define max
  (letrec ((iter (lambda (x L) (if (null? L) x (let ((y (first L))) (iter (if (> x y) x y) (rest L)))))))
   (lambda L
    (iter (first L) (rest L)))))
 
-(define min 
+(define min
  (letrec ((iter (lambda (x L) (if (null? L) x (let ((y (first L))) (iter (if (< x y) x y) (rest L)))))))
   (lambda L
    (iter (first L) (rest L)))))
@@ -531,7 +533,7 @@
   (define (make-list I L)
    (begin
     (if (< I 0) L
-        (make-list (- I 1) 
+        (make-list (- I 1)
             (Pair. (java.lang.reflect.Array.get A I) L)))))
   (make-list (- (java.lang.reflect.Array.getLength A) 1) ()))
 
@@ -560,15 +562,15 @@
 
 ;;  (// "========== SECTION 6.4 SYMBOLS ==========")
 ;;  predefined in BootstrapCore.scm
-;;     symbol? 
+;;     symbol?
 
 (define (symbol->string S) (.toString S))
 (define (string->symbol S) (Symbol.intern S))
 
 ;;  (// "========== SECTION 6.5 NUMBERS ==========")
 ;;  predefined in BootstrapCore.scm
-;;     number? = < > <= >= + * - / max min 
-;;     % & ^ | ~ << >> >>> == != 
+;;     number? = < > <= >= + * - / max min
+;;     % & ^ | ~ << >> >>> == !=
 ;;
 
 (define (integer? x)
@@ -587,14 +589,14 @@
 (define (even? x) (= 0 (% x 2)))
 
 
-(define abs java.lang.Math.abs)
+(define abs java.lang.StrictMath.abs)
 (define quotient Op.div)
 (define remainder Op.mod)
-(define (modulo x y) 
-   (let ((z (Op.mod x y))) 
+(define (modulo x y)
+   (let ((z (Op.mod x y)))
         (if (or (equal? (> y 0) (> z 0)) (= z 0)) z (+ z y))))
 
-(define gcd 
+(define gcd
   (letrec ((gcd2 (lambda (x y) (if (< x y) (gcd2 y x) (if (= y 0) x (gcd2 y (% x y))))))
            (iter (lambda (x L) (if (null? L) x (if (= x 1) 1 (iter (gcd2 (.longValue x) (.longValue (abs (first L)))) (rest L)))))))
   (lambda L
@@ -602,30 +604,30 @@
 
 (define lcm
   (letrec ((lcm2 (lambda (x y) (/ (* x y) (gcd x y))))
-           (iter (lambda (x L) 
+           (iter (lambda (x L)
                     (if (null? L) x (iter (lcm2 (.longValue x) (.longValue (abs (first L)))) (rest L))))))
     (lambda L (iter 1 L))))
 
 ;;  (// "inessential numerator, denominator, rationalize not implemented")
 
-(define (floor x) (java.lang.Math.floor (.doubleValue x)))
-(define (ceiling x) (java.lang.Math.ceil (.doubleValue x)))
+(define (floor x) (java.lang.StrictMath.floor (.doubleValue x)))
+(define (ceiling x) (java.lang.StrictMath.ceil (.doubleValue x)))
 (define (truncate x) (if (< x 0) (ceiling x) (floor x)))
-(define (round x) (java.lang.Math.round (.doubleValue x)))
+(define (round x) (java.lang.StrictMath.round (.doubleValue x)))
 
-(define (exp x) (java.lang.Math.exp (.doubleValue x)))
-(define (log x) (java.lang.Math.log (.doubleValue x)))
-(define (sin x) (java.lang.Math.sin (.doubleValue x)))
-(define (cos x) (java.lang.Math.cos (.doubleValue x)))
-(define (tan x) (java.lang.Math.tan (.doubleValue x)))
-(define (asin x) (java.lang.Math.asin (.doubleValue x)))
-(define (acos x) (java.lang.Math.acos (.doubleValue x)))
-(define atan (lambda (x . R) 
+(define (exp x) (java.lang.StrictMath.exp (.doubleValue x)))
+(define (log x) (java.lang.StrictMath.log (.doubleValue x)))
+(define (sin x) (java.lang.StrictMath.sin (.doubleValue x)))
+(define (cos x) (java.lang.StrictMath.cos (.doubleValue x)))
+(define (tan x) (java.lang.StrictMath.tan (.doubleValue x)))
+(define (asin x) (java.lang.StrictMath.asin (.doubleValue x)))
+(define (acos x) (java.lang.StrictMath.acos (.doubleValue x)))
+(define atan (lambda (x . R)
                  (if (null? R)
-                     (java.lang.Math.atan (.doubleValue x))
-                     (java.lang.Math.atan (.doubleValue x) (.doubleValue (first R)))))))
-(define (sqrt x) (java.lang.Math.sqrt (.doubleValue x)))
-(define (expt x y) (java.lang.Math.pow (.doubleValue x) (.doubleValue y)))
+                     (java.lang.StrictMath.atan (.doubleValue x))
+                     (java.lang.StrictMath.atan (.doubleValue x) (.doubleValue (first R)))))))
+(define (sqrt x) (java.lang.StrictMath.sqrt (.doubleValue x)))
+(define (expt x y) (java.lang.StrictMath.pow (.doubleValue x) (.doubleValue y)))
 
 ;;  (// "inessential complex arithmetic not implemented")
 (define (exact->inexact x) (.doubleValue x))
@@ -633,20 +635,20 @@
 
 (define string->number
   (lambda L
-    (if (= (length L) 2) 
-        (if (= (second L) 10) 
+    (if (= (length L) 2)
+        (if (= (second L) 10)
             (java.lang.Double. (first L))
             (java.lang.Long.parseLong (first L) (second L)))
         (java.lang.Double. (first L)))))
 
-(define number->string  
+(define number->string
   (lambda L
-    (if (= (length L) 2) 
+    (if (= (length L) 2)
         (if (= (second L) 10)
             (.toString (first L))
             (java.lang.Long.toString (first L) (second L)))
         (.toString (first L)))))
-                        
+
 ;;  (// "========== SECTION 6.6 CHARACTERS ==========")
 
 (define (char? x) (.isInstance java.lang.Character.class x))
@@ -674,11 +676,11 @@
 ;;  (// "========== SECTION 6.7 STRINGS ==========")
 
 (define (string? x) (.isInstance java.lang.String.class x))
-(define make-string 
+(define make-string
  (letrec ((iter (lambda (I N C B) (if (< I N) (begin (.insert B I C) (iter (+ I 1) N C B)) B))))
-  (lambda L 
-    (if (null? (cdr L)) 
-       (java.lang.String. (java.lang.reflect.Array.newInstance char.class (first L))) 
+  (lambda L
+    (if (null? (cdr L))
+       (java.lang.String. (java.lang.reflect.Array.newInstance char.class (first L)))
        (java.lang.String. (iter 0 (first L) (second L) (java.lang.StringBuffer. (first L))))))))
 
 (define string (lambda L (java.lang.String. (list->array java.lang.Character.class L))))
@@ -697,7 +699,7 @@
 (define (string-ci<=? x y) (<= (.compareTo (.toUpperCase x) (.toUpperCase y)) 0))
 (define (string-ci>=? x y) (>= (.compareTo (.toUpperCase x) (.toUpperCase y)) 0))
 (define (substring s x y) (.substring s x y))
-(define string-append 
+(define string-append
   (lambda L
      (let loop ((L L) (B (java.lang.StringBuffer.)))
          (if (null? L) (.toString B)
@@ -718,8 +720,8 @@
        ((2) (let ((v (second R))
                   (n (first R))
                   (z (java.lang.reflect.Array.newInstance Object.class (first R))))
-              (let loop ((i 0)) 
-                 (if (< i n) 
+              (let loop ((i 0))
+                 (if (< i n)
                     (begin (java.lang.reflect.Array.set z i v) (loop (+ i 1)))
                     z))))
        (else (throw "Error in make-vector. Must have 1 or 2 args")))))
@@ -736,7 +738,7 @@
 (define (procedure? x) (.isInstance Procedure.class x))
 (define (apply x y) (.apply x y))
 
-(define map 
+(define map
  (letrec ((firsts (lambda (L) (if (null? L) () (cons (first (first L)) (firsts (rest L))))))
           (rests  (lambda (L) (if (null? L) () (cons (rest  (first L)) (rests  (rest L)))))))
   (lambda (F . Lists)
@@ -750,7 +752,7 @@
   (lambda (F . Lists)
     (if (null? (first Lists)) ()
         (begin
-           (apply F (firsts Lists)) 
+           (apply F (firsts Lists))
            (apply for-each (cons F (rests Lists))))))))
 
 (define (force x)  (if (procedure? x) (.apply x ()) x))
@@ -852,7 +854,7 @@
   (RawConstructor. (Invoke.findConstructor x L))))
 (define method (lambda (x y . L)
   (RawMethod. (Invoke.findMethod (.toString x) y L))))
-(define new (lambda (x . L) 
+(define new (lambda (x . L)
   (Invoke.invokeConstructor (.getName (class x)) (list->vector L))))
 (define invoke (lambda (x y . L)
   (Invoke.invokeInstance x y (list->vector L))))
@@ -925,7 +927,7 @@
   (define (make-list I L)
    (begin
     (if (< I 0) L
-        (make-list (- I 1) 
+        (make-list (- I 1)
             (Pair. (java.lang.reflect.Array.get A I) L)))))
   (make-list (- (java.lang.reflect.Array.getLength A) 1) ()))
 
@@ -939,9 +941,9 @@
 (define (missing-classes classes sofar)
   (if (null? classes) sofar
       (missing-classes (cdr classes)
-		       (if (eq? (class (car classes)) #null)
-			   (cons (car classes) sofar)
-			   sofar))))
+                       (if (eq? (class (car classes)) #null)
+                           (cons (car classes) sofar)
+                           sofar))))
 
 (define-macro (if-classes classes then else)
   (if (null? (missing-classes classes '()))
@@ -965,32 +967,32 @@
 (define (define-method-runtime name type-names f name-args)
   (let ((missing (missing-classes type-names '())))
     (if (null? missing)
-	(jsint.Generic.defineMethod name type-names f)
-	(jsint.E.warn (string-append "Can't define-method " name-args
-			       " classes " missing " do not exist.")))))
+        (jsint.Generic.defineMethod name type-names f)
+        (jsint.E.warn (string-append "Can't define-method " name-args
+                               " classes " missing " do not exist.")))))
 (define-macro (define-method name-args . body)
     (define (arg-name x) (if (pair? x) (car x) x))
     (define (maybe-second x default)
       (if (and (pair? x) (pair? (cdr x))) (cadr x)
-	  default))
+          default))
     (define (arg-type x) (maybe-second x 'java.lang.Object))
     (let* ((name (car name-args))
-	   (args (cdr name-args))
-	   (arg-types (map arg-type args)))
+           (args (cdr name-args))
+           (arg-types (map arg-type args)))
       `(define-method-runtime
        ',name ',arg-types (lambda ,(map arg-name args) ,@body)
        ',name-args)))
-      
+
 (define-macro (package . args) #t)
 
 (define (array a-class . args)
   (let ((v (make-array a-class (length args))))
     (let loop ((i 0)
-	       (as args))
+               (as args))
       (if (null? as) v
-	  (begin
-	    (vector-set! v i (car as))
-	    (loop (+ i 1) (cdr as)))))))
+          (begin
+            (vector-set! v i (car as))
+            (loop (+ i 1) (cdr as)))))))
 
 (define (make-array a-class size)
   (java.lang.reflect.Array.newInstance a-class size))
@@ -1000,12 +1002,12 @@
       ((args args)
        (sb (StringBuffer.)))
     (cond ((null? args) (.toString sb))
-	  ((pair? (car args))
-	   (loop (cons (car (car args))
-		       (cons (cdr (car args)) (cdr args))) sb))
-	  ((null? (car args)) (loop (cdr args) sb))
-	  (else (.append sb (U.stringify (car args) #f))
-		(loop (cdr args) sb)))))
+          ((pair? (car args))
+           (loop (cons (car (car args))
+                       (cons (cdr (car args)) (cdr args))) sb))
+          ((null? (car args)) (loop (cdr args) sb))
+          (else (.append sb (U.stringify (car args) #f))
+                (loop (cdr args) sb)))))
 
 ;;; KRA 05JAN04: This may not work in all Java environments, Netscape
 ;;; for example.  Also,use this with care Java really expects strings
@@ -1017,11 +1019,11 @@
 (define (string-fill! s x)
   (.hash$# s 0)
   (let ((L (string-length s))
-	(v (.value$# s)))
+        (v (.value$# s)))
     (let loop ((i 0))
       (if (< i L)
-	  (begin (vector-set! v i x)
-		 (loop (+ i 1)))))
+          (begin (vector-set! v i x)
+                 (loop (+ i 1)))))
     s))
 
 (define (string-copy s) (.toString (StringBuffer. s)))
@@ -1035,17 +1037,17 @@
 ;;    SPECIFIER is one of 'import-procedures, 'import-macros, 'import  --- default is import-procedures
 ;;    SYMBOLS is either 'all or a list of symbols '(a b c ...) -- default is 'all
 ;;    PREFIX is a prefix string -- default is ""
-;; 
+;;
 (define use-module (lambda (filename . R)
   (case (length R)
     ((0) (use-module filename 'import 'all #f))
     ((1) (use-module filename (first R) 'all #f))
     ((2) (use-module filename (first R) (second R) #f))
-    (else 
+    (else
      (let* ((specifier (first R))
             (symbols (second R))
             (prefix (third R))
-            (symarray 
+            (symarray
              (if (or (equal? symbols #null) (equal? symbols 'all))
                   #null
                  (list->array jsint.Symbol.class symbols))))

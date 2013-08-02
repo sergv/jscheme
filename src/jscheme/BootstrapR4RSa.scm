@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; BootstrapR4RSa.scm
-;;   this contains a definition of the Scheme R4RS primitives 
+;;   this contains a definition of the Scheme R4RS primitives
 ;;   in "core" Jscheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -27,21 +27,21 @@
 (define eqv? Op.eqv)
 
 ;; here we define eq? to hold for all scalar quantities
-(define (eq? x y) 
-  (or 
-     (Op.sameObject x y) 
-     (and (or (.isInstance java.lang.Character.class x) 
-              (.isInstance java.lang.Boolean.class x) 
-              (.isInstance java.lang.Number.class x) 
+(define (eq? x y)
+  (or
+     (Op.sameObject x y)
+     (and (or (.isInstance java.lang.Character.class x)
+              (.isInstance java.lang.Boolean.class x)
+              (.isInstance java.lang.Number.class x)
             )
          (.equals x y))))
 
-          ;; two objects are equal if they are 
-          ;;   lists of equals, or arrays of equals, 
+          ;; two objects are equal if they are
+          ;;   lists of equals, or arrays of equals,
           ;;   or are eqv?
 (define (equal? x y)
-  (define (eqpair? x y)                  
-     (and (equal? (first x) (first y)) 
+  (define (eqpair? x y)
+     (and (equal? (first x) (first y))
           (equal? (rest x) (rest y))))
   (define (eqarray? x y)
      (and (eqv? (java.lang.reflect.Array.getLength x) (java.lang.reflect.Array.getLength y))
@@ -52,12 +52,12 @@
          (eqarrayiter? (- N 1) x y)
          #f)))
   (cond ((eqv? x y) #t)
-        ((and (pair? x) (pair? y)) 
+        ((and (pair? x) (pair? y))
          (eqpair? x y))
         ((and (.isArray (.getClass x)) (.isArray (.getClass y)))
          (eqarray? x y))
         (else #f)))
-         
+
 ;;  (// "========== SECTION 6.3 LISTS AND PAIRS ==========")
 ;; most are defined in BootstrapCore.scm
 ;;
@@ -111,15 +111,15 @@
 
 ;;  (// "========== SECTION 6.4 SYMBOLS ==========")
 ;;  predefined in BootstrapCore.scm
-;;     symbol? 
+;;     symbol?
 
 (define (symbol->string S) (.toString S))
 (define (string->symbol S) (Symbol.intern S))
 
 ;;  (// "========== SECTION 6.5 NUMBERS ==========")
 ;;  predefined in BootstrapCore.scm
-;;     number? = < > <= >= + * - / max min 
-;;     % & ^ | ~ << >> >>> == != 
+;;     number? = < > <= >= + * - / max min
+;;     % & ^ | ~ << >> >>> == !=
 ;;
 
 (define (integer? x)
@@ -138,14 +138,14 @@
 (define (even? x) (= 0 (% x 2)))
 
 
-(define abs java.lang.Math.abs)
+(define abs java.lang.StrictMath.abs)
 (define quotient Op.div)
 (define remainder Op.mod)
-(define (modulo x y) 
-   (let ((z (Op.mod x y))) 
+(define (modulo x y)
+   (let ((z (Op.mod x y)))
         (if (or (equal? (> y 0) (> z 0)) (= z 0)) z (+ z y))))
 
-(define gcd 
+(define gcd
   (letrec ((gcd2 (lambda (x y) (if (< x y) (gcd2 y x) (if (= y 0) x (gcd2 y (% x y))))))
            (iter (lambda (x L) (if (null? L) x (if (= x 1) 1 (iter (gcd2 (.longValue x) (.longValue (abs (first L)))) (rest L)))))))
   (lambda L
@@ -153,27 +153,27 @@
 
 (define lcm
   (letrec ((lcm2 (lambda (x y) (/ (* x y) (gcd x y))))
-           (iter (lambda (x L) 
+           (iter (lambda (x L)
                     (if (null? L) x (iter (lcm2 (.longValue x) (.longValue (abs (first L)))) (rest L))))))
     (lambda L (iter 1 L))))
 
 ;;  (// "inessential numerator, denominator, rationalize not implemented")
 
-(define (floor x) (java.lang.Math.floor (.doubleValue x)))
-(define (ceiling x) (java.lang.Math.ceil (.doubleValue x)))
+(define (floor x) (java.lang.StrictMath.floor (.doubleValue x)))
+(define (ceiling x) (java.lang.StrictMath.ceil (.doubleValue x)))
 (define (truncate x) (if (< x 0) (ceiling x) (floor x)))
-(define (round x) (java.lang.Math.round (.doubleValue x)))
+(define (round x) (java.lang.StrictMath.round (.doubleValue x)))
 
-(define (exp x) (java.lang.Math.exp (.doubleValue x)))
-(define (log x) (java.lang.Math.log (.doubleValue x)))
-(define (sin x) (java.lang.Math.sin (.doubleValue x)))
-(define (cos x) (java.lang.Math.cos (.doubleValue x)))
-(define (tan x) (java.lang.Math.tan (.doubleValue x)))
-(define (asin x) (java.lang.Math.asin (.doubleValue x)))
-(define (acos x) (java.lang.Math.acos (.doubleValue x)))
-(define (atan x) (java.lang.Math.atan (.doubleValue x)))
-(define (sqrt x) (java.lang.Math.sqrt (.doubleValue x)))
-(define (expt x y) (java.lang.Math.pow (.doubleValue x) (.doubleValue y)))
+(define (exp x) (java.lang.StrictMath.exp (.doubleValue x)))
+(define (log x) (java.lang.StrictMath.log (.doubleValue x)))
+(define (sin x) (java.lang.StrictMath.sin (.doubleValue x)))
+(define (cos x) (java.lang.StrictMath.cos (.doubleValue x)))
+(define (tan x) (java.lang.StrictMath.tan (.doubleValue x)))
+(define (asin x) (java.lang.StrictMath.asin (.doubleValue x)))
+(define (acos x) (java.lang.StrictMath.acos (.doubleValue x)))
+(define (atan x) (java.lang.StrictMath.atan (.doubleValue x)))
+(define (sqrt x) (java.lang.StrictMath.sqrt (.doubleValue x)))
+(define (expt x y) (java.lang.StrictMath.pow (.doubleValue x) (.doubleValue y)))
 
 ;;  (// "inessential complex arithmetic not implemented")
 (define (exact->inexact x) (.doubleValue x))
@@ -181,20 +181,20 @@
 
 (define string->number
   (lambda L
-    (if (= (length L) 2) 
-        (if (= (second L) 10) 
+    (if (= (length L) 2)
+        (if (= (second L) 10)
             (java.lang.Double. (first L))
             (java.lang.Long.parseLong (first L) (second L)))
         (java.lang.Double. (first L)))))
 
-(define number->string  
+(define number->string
   (lambda L
-    (if (= (length L) 2) 
+    (if (= (length L) 2)
         (if (= (second L) 10)
             (.toString (first L))
             (java.lang.Long.toString (first L) (second L)))
         (.toString (first L)))))
-                        
+
 ;;  (// "========== SECTION 6.6 CHARACTERS ==========")
 
 (define (char? x) (.isInstance java.lang.Character.class x))
@@ -222,11 +222,11 @@
 ;;  (// "========== SECTION 6.7 STRINGS ==========")
 
 (define (string? x) (.isInstance java.lang.String.class x))
-(define make-string 
+(define make-string
  (letrec ((iter (lambda (I N C B) (if (< I N) (begin (.insert B I C) (iter (+ I 1) N C B)) B))))
-  (lambda L 
-    (if (null? (cdr L)) 
-       (java.lang.String. (java.lang.reflect.Array.newInstance char.class (first L))) 
+  (lambda L
+    (if (null? (cdr L))
+       (java.lang.String. (java.lang.reflect.Array.newInstance char.class (first L)))
        (java.lang.String. (iter 0 (first L) (second L) (java.lang.StringBuffer. (first L))))))))
 
 (define string (lambda L (java.lang.String. (list->array java.lang.Character.class L))))
@@ -245,7 +245,7 @@
 (define (string-ci<=? x y) (<= (.compareTo (.toUpperCase x) (.toUpperCase y)) 0))
 (define (string-ci>=? x y) (>= (.compareTo (.toUpperCase x) (.toUpperCase y)) 0))
 (define (substring s x y) (.substring s x y))
-(define string-append 
+(define string-append
   (lambda L
      (let loop ((L L) (B (java.lang.StringBuffer.)))
          (if (null? L) (.toString B)
@@ -267,8 +267,8 @@
        ((2) (let ((v (second R))
                   (n (first R))
                   (z (java.lang.reflect.Array.newInstance Object.class (first R))))
-              (let loop ((i 0)) 
-                 (if (< i n) 
+              (let loop ((i 0))
+                 (if (< i n)
                     (begin (java.lang.reflect.Array.set z i v) (loop (+ i 1)))
                     z))))
        (else (throw "Error in make-vector. Must have 1 or 2 args")))))
@@ -285,7 +285,7 @@
 (define (procedure? x) (.isInstance Procedure.class x))
 (define (apply x y) (.apply x y))
 
-(define map 
+(define map
  (letrec ((firsts (lambda (L) (if (null? L) () (cons (first (first L)) (firsts (rest L))))))
           (rests  (lambda (L) (if (null? L) () (cons (rest  (first L)) (rests  (rest L)))))))
   (lambda (F . Lists)
@@ -299,7 +299,7 @@
   (lambda (F . Lists)
     (if (null? (first Lists)) ()
         (begin
-           (apply F (firsts Lists)) 
+           (apply F (firsts Lists))
            (apply for-each (cons F (rests Lists))))))))
 
 (define (force x)  (if (procedure? x) (.apply x ()) x))
@@ -399,7 +399,7 @@
   (RawConstructor. (Invoke.findConstructor x L))))
 (define method (lambda (x y . L)
   (RawMethod. (Invoke.findMethod (.toString x) y L))))
-(define new (lambda (x . L) 
+(define new (lambda (x . L)
   (Invoke.invokeConstructor (.getName (class x)) (list->vector L))))
 (define invoke (lambda (x y . L)
   (Invoke.invokeInstance x y (list->vector L))))
@@ -472,7 +472,7 @@
   (define (make-list I L)
    (begin
     (if (< I 0) L
-        (make-list (- I 1) 
+        (make-list (- I 1)
             (Pair. (java.lang.reflect.Array.get A I) L)))))
   (make-list (- (java.lang.reflect.Array.getLength A) 1) ()))
 
@@ -516,7 +516,7 @@
       `(define-method-runtime
        ',name ',arg-types (lambda ,(map arg-name args) ,@body)
        ',name-args)))
-      
+
 (define-macro (package . args) #t)
 
 (define (array a-class . args)
@@ -571,17 +571,17 @@
 ;;    SPECIFIER is one of 'import-procedures, 'import-macros, 'import  --- default is import-procedures
 ;;    SYMBOLS is either 'all or a list of symbols '(a b c ...) -- default is 'all
 ;;    PREFIX is a prefix string -- default is ""
-;; 
+;;
 (define use-module (lambda (filename . R)
   (case (length R)
     ((0) (use-module filename 'import 'all #f))
     ((1) (use-module filename (first R) 'all #f))
     ((2) (use-module filename (first R) (second R) #f))
-    (else 
+    (else
      (let* ((specifier (first R))
             (symbols (second R))
             (prefix (third R))
-            (symarray 
+            (symarray
              (if (or (equal? symbols #null) (equal? symbols 'all))
                   #null
                  (list->array jsint.Symbol.class symbols))))

@@ -10,23 +10,24 @@ package jsint;
 
 public class Macro extends Closure {
 
-    /** Make a macro from a parameter list, body, and environment. **/
-    public Macro (Object parms, Object body, LexicalEnvironment lexenv) {
-      super(parms, body, lexenv);
-    }
-
-
-  public static Object expand(Pair x) {
-    Object f = U.first(x);
-    Object fval = (f instanceof Symbol) ? 
-                       (((Symbol) f).isDefined()?((Symbol)f).getGlobalValue():null)
-                       : null;
-    if (fval instanceof Macro)
-      return ((Macro)fval).apply(U.toList(x.rest));
-    else return x;
-  }
-
-  public String toString() {
-    return "(macro " + this.name + " " + U.stringify(parms) + "...)";
-  }
+/** Make a macro from a parameter list, body, and environment. **/
+public Macro(Object parms, Object body, LexicalEnvironment lexenv) {
+    super(parms, body, lexenv);
 }
+
+
+public static Object expand(Pair x) {
+    Object f = U.first(x);
+    Object fval = (f instanceof Symbol) ?
+                  (((Symbol) f).isDefined() ? ((Symbol)f).getGlobalValue() : null)
+                  : null;
+    if (fval instanceof Macro) {
+        return ((Macro)fval).apply(U.toList(x.rest));
+    } else { return x; }
+}
+
+public String toString() {
+    return "(macro " + this.name + " " + U.stringify(parms) + "...)";
+}
+}
+

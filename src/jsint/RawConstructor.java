@@ -9,16 +9,17 @@ package jsint;
 
 import java.lang.reflect.Constructor;
 
-public class RawConstructor extends Procedure{
-  private Constructor method;
+public class RawConstructor extends Procedure {
+private Constructor method;
 
-  public RawConstructor(Constructor method) {
+public RawConstructor(Constructor method) {
     this.method = method;
     this.minArgs = method.getParameterTypes().length;
     this.maxArgs = minArgs;
-  }
-    
-  public Object apply(Object[] args) {
-    return Invoke.invokeRawConstructor(method, args);
-  }
 }
+
+public Object apply(Object[] args) {
+    return Invoke.invokeRawConstructor(method, args);
+}
+}
+

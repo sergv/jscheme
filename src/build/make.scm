@@ -30,7 +30,7 @@
 
 (define (findJavacBin)
   ;; Find the bin/ containing javac.
-  ;; KRA 19MAR02: New rules from Derek Upham. 
+  ;; KRA 19MAR02: New rules from Derek Upham.
   ;; 1. ${java.home}/bin
   ;; 2. ${java.home}/../bin
   ;; 3. every directory in "java.library.path"
@@ -53,7 +53,7 @@
 		      ds))))
     (if (null? result)
 	(error "\nCan't find javac in path variable! \nPlease
-fix, and 
+fix, and
 try again.\nExiting !!!\n")
 	(car result))))
 
@@ -70,9 +70,9 @@ try again.\nExiting !!!\n")
 	 "dclass"
 	 "elf"
 	 "interact"
-	 "jlib"
+	 ;; "jlib"
 	 "jscheme"
-	 "jschemeweb"			; references Servlet	
+	 "jschemeweb"			; references Servlet
 	 "jsint"
 	 ;; "slib"				; no Java.
 	 "using"
@@ -96,7 +96,7 @@ try again.\nExiting !!!\n")
 (define (javac . files)
   (let ((files (filter javaUpdate? files)))
     (if (> (length files) 0)
-	(begin 
+	(begin
 	  (javacMessage #f files)
 	  (out (run (cmd javac -g -classpath ,compileClasspath
 		    -d ,classDir ,@files))))
@@ -131,7 +131,7 @@ try again.\nExiting !!!\n")
 
 (define (isSchemeFile f)
   ;; Local definition to capture elf/eopl2/jscheme/psyntax.*
-  ;; And slib jscheme.init files. 
+  ;; And slib jscheme.init files.
   (let ((f (.toString (.getName f))))
     (or (.endsWith f ".scm")
         (.endsWith f ".sch")		; gabriel
@@ -169,11 +169,11 @@ try again.\nExiting !!!\n")
 (define (make-jlib)
   "Compile JLIB and Newtworking."
   (and
-   (javac (src "jsint/SchemeApplet.java") (src "jlib/SchemeCanvas.java"))
-   (compile "jlib/JLIB" "jlib")
-   (compile "jlib/Swing" "jlib")
-   (compile "jlib/Networking" "jlib")
-   (compile "jlib/SNLP" "jlib")
+   ;; (javac (src "jsint/SchemeApplet.java") (src "jlib/SchemeCanvas.java"))
+   ;; (compile "jlib/JLIB" "jlib")
+   ;; (compile "jlib/Swing" "jlib")
+   ;; (compile "jlib/Networking" "jlib")
+   ;; (compile "jlib/SNLP" "jlib")
    ))
 
 (define (copyFiles** from to predicate)
@@ -228,7 +228,7 @@ Where command is one of:\n})
   (for-each javacAll directories)
   (make-compiler)
   (make-jlib))
-  
+
 (define-command (-jar)
   "Make lib/jscheme.jar lib/jscheme.zip applet.jar and lib/jschemelite.jar"
   ;; Build jscheme.jar with everything in it.
@@ -248,13 +248,13 @@ Where command is one of:\n})
                         (map (lambda (d)(files* (File. classDir d)
                                                 isClassFile))
                              '("jsint" "jscheme"))
-                        (map (lambda(x) (File. classDir (.toString x))) 
+                        (map (lambda(x) (File. classDir (.toString x)))
                              '(jlib/JLIB.scm jlib/SNLP.scm jlib/Swing.scm
                                              jscheme/prims.scm))
                         (files* (File. classDir "elf") isSchemeFile)))))))
 
   (display {lib/applet.jar built.\n})
-    
+
   ;; Build the smallest possible jar.
   (out (run (cmd jar cfm lib/jschemelite.jar ,(src "build/manifest")
                  -C ,classDir build/SchemeLite.class)))
@@ -272,7 +272,7 @@ Where command is one of:\n})
   (display "-javadoc\n")
   (let* ((packageFile (.getCanonicalFile (File. "doc/java-packages.txt")))
          (javaFile (.getCanonicalFile (File. "doc/java-files.txt")))
-	 (args (list 
+	 (args (list
 		"-overview" (File. "doc/overview.html")
 		"-classpath" compileClasspath
 		"-d" (mkdirs (File. "doc/api"))

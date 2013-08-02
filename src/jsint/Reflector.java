@@ -9,30 +9,32 @@ import java.util.Vector;
 
 
 public abstract class Reflector extends Procedure {
-  public static final Vector reflectors = new Vector(100);
+public static final Vector reflectors = new Vector(100);
 
-  /** Reset all know reflectors **/
-  public static void resetAll() {
+/** Reset all know reflectors **/
+public static void resetAll() {
     Enumeration i = reflectors.elements();
-    while (i.hasMoreElements())
-      ((Reflector) i.nextElement()).reset();
-  }
+    while (i.hasMoreElements()) {
+        ((Reflector) i.nextElement()).reset();
+    }
+}
 
-  public boolean isPrivileged = false;
+public boolean isPrivileged = false;
 
-  /** Add yourself to the reflectors **/
-  public Reflector() {
+/** Add yourself to the reflectors **/
+public Reflector() {
     reflectors.addElement(this);
-  }
+}
 
-  /** Reset your classpath dependent state.  This method can't be
-      abstract.
-  **/
-  protected synchronized void reset() {}
+/** Reset your classpath dependent state.  This method can't be
+    abstract.
+**/
+protected synchronized void reset() {}
 
-  protected Object readResolve() {
+protected Object readResolve() {
     reset();
     return this;
-  }
+}
 
 }
+

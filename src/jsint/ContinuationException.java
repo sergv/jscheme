@@ -4,12 +4,13 @@ package jsint;
 **/
 
 public class ContinuationException extends RuntimeException {
-  /** Clever performance trick i found in
-      http://docs.msdnaa.net/ark_new/Webfiles/WhitePapers/Babel01/bab12.pdf
-  **/
-  public Throwable fillInStackTrace() {
+/** Clever performance trick i found in
+    http://docs.msdnaa.net/ark_new/Webfiles/WhitePapers/Babel01/bab12.pdf
+**/
+public Throwable fillInStackTrace() {
     return this;
-  }
+}
 }
 
-  
+
+

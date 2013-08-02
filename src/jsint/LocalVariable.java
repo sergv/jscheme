@@ -17,20 +17,21 @@ package jsint;
  **/
 public class LocalVariable implements java.io.Serializable {
 
-  /** The number of levels up in the parent chain where the variable is. **/
-  public int up;
-  /** The ordinal position in the environment where the variable is. **/
-  public int in;
-  /** The name of the variable (for debugging purposes only). **/
-  Symbol name;
+/** The number of levels up in the parent chain where the variable is. **/
+public int up;
+/** The ordinal position in the environment where the variable is. **/
+public int in;
+/** The name of the variable (for debugging purposes only). **/
+Symbol name;
 
-  /** Create a new variable. **/
-  public LocalVariable(int up, int in, Symbol name) {
+/** Create a new variable. **/
+public LocalVariable(int up, int in, Symbol name) {
     this.up = up; this.in = in; this.name = name;
-  }
-
-  /** Use the name, up and in of the variable as its String
-      representation so they distinguish themselves from a Global
-      variable. **/
-  public String toString() { return name.toString() + "^" + up + in; }
 }
+
+/** Use the name, up and in of the variable as its String
+    representation so they distinguish themselves from a Global
+    variable. **/
+public String toString() { return name.toString() + "^" + up + in; }
+}
+

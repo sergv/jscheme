@@ -9,24 +9,26 @@ import java.lang.reflect.Constructor;
 
 public abstract class StaticReflector extends Reflector {
 
-  public static final Object[] args0 = new Object[0];
+public static final Object[] args0 = new Object[0];
 
-  /** Code is an Object[] who's first element is a JavaConstructor, and
-   * remaining elements are arguments.
-  **/
-  public Object[] makeArgArray(Object[] code,
-                               Evaluator eval,
-                               LexicalEnvironment lexenv) {
+/** Code is an Object[] who's first element is a JavaConstructor, and
+ * remaining elements are arguments.
+**/
+public Object[] makeArgArray(Object[] code,
+                             Evaluator eval,
+                             LexicalEnvironment lexenv) {
     int L = code.length - 1;
-    if (L == 0) return args0;
-    
-    Object[] args = new Object[L];
-    for (int i = 0; i < L; i++)
-      args[i] = eval.execute(code[i+1], lexenv);
-    return args;
-  }
+    if (L == 0) { return args0; }
 
-  public Object[] makeArgArray (Pair args) {
-    return U.listToVector(args);
-  }
+    Object[] args = new Object[L];
+    for (int i = 0; i < L; i++) {
+        args[i] = eval.execute(code[i + 1], lexenv);
+    }
+    return args;
 }
+
+public Object[] makeArgArray(Pair args) {
+    return U.listToVector(args);
+}
+}
+

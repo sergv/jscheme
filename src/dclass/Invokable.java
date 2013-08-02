@@ -2,12 +2,13 @@
 package dclass;
 
 public class Invokable extends Modified {
-  public Object args;
-  public Object body;
+public Object args;
+public Object body;
 
-  public String toString() {
+public String toString() {
     return "{" + this.getClass().getName() + " " + modifiers + " "
-      + name + " " + args + " " + body + " "
-      + "}";
-  }
+           + name + " " + args + " " + body + " "
+           + "}";
 }
+}
+

@@ -10,9 +10,10 @@ package jsint;
 */
 
 public class JavaListener {
-  public Procedure handler;
-  public JavaListener() {super();}
-  public JavaListener(Procedure handler) {
+public Procedure handler;
+public JavaListener() {super();}
+public JavaListener(Procedure handler) {
     this.handler = handler;
-  }
 }
+}
+

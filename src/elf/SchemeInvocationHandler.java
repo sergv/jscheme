@@ -18,12 +18,13 @@ import jscheme.JScheme;
  **/
 public class SchemeInvocationHandler implements InvocationHandler {
 
-  Procedure proc;
+Procedure proc;
 
-  public SchemeInvocationHandler(Procedure proc) { this.proc = proc; }
+public SchemeInvocationHandler(Procedure proc) { this.proc = proc; }
 
-  public Object invoke(Object proxy, Method method, Object[] args)
-    throws Throwable {
+public Object invoke(Object proxy, Method method, Object[] args)
+throws Throwable {
     return JScheme.forCurrentEvaluator().call(proc, proxy, method, args);
-  }
 }
+}
+

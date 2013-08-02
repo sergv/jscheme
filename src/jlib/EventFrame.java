@@ -13,39 +13,38 @@ import jsint.*;
  *  This is needed when working with the Java 1.0 event
  *  model which does not have event listeners.
  *
- *  @author Timothy J. Hickey, tim@cs.brandeis.edu http://www.cs.brandeis.edu/~tim 
+ *  @author Timothy J. Hickey, tim@cs.brandeis.edu http://www.cs.brandeis.edu/~tim
  */
 
 
 public class EventFrame extends java.awt.Frame {
 
-    public Procedure handler;
+public Procedure handler;
 
-    public EventFrame() {
-	super();
-    }
+public EventFrame() {
+    super();
+}
 
-    public EventFrame(String title) {
-	super(title);
-    }
+public EventFrame(String title) {
+    super(title);
+}
 
-  public void addEventHandler(Procedure callback) {
-     handler = callback;
-  }
+public void addEventHandler(Procedure callback) {
+    handler = callback;
+}
 
-  public void update(Graphics g) {
+public void update(Graphics g) {
     paint(g);
-  }
+}
 
-  public boolean handleEvent(Event e) {
+public boolean handleEvent(Event e) {
 
     if (handler != null) {
-       return (null != handler.apply(U.list(e)));
-    }
-    else if (e.id==Event.WINDOW_DESTROY) {
-       hide(); dispose(); return true;
-    }
-    else return super.handleEvent(e);
-  }
+        return (null != handler.apply(U.list(e)));
+    } else if (e.id == Event.WINDOW_DESTROY) {
+        hide(); dispose(); return true;
+    } else { return super.handleEvent(e); }
 }
+}
+
 

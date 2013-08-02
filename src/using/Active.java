@@ -11,21 +11,22 @@ import jscheme.JScheme;
   jscheme.JScheme, the Java Scheme interface.
  */
 public class Active {
-  /** The JScheme instance we will use/ */
-  private static JScheme js = new JScheme();
+/** The JScheme instance we will use/ */
+private static JScheme js = new JScheme();
 
-  /** Load the JScheme code you need when the class is first referenced. **/
-  static { js.evalOrLoad("elf/basic.scm"); }
+/** Load the JScheme code you need when the class is first referenced. **/
+static { js.evalOrLoad("elf/basic.scm"); }
 
-  /** Describe the contents of Object x. **/
-  public static void describe (Object x) { js.call("describe", x); }
+/** Describe the contents of Object x. **/
+public static void describe(Object x) { js.call("describe", x); }
 
-  /** Start a detatched garbage collection panel **/
-  public static void gcMonitor () { js.evalOrLoad("elf/GCMonitor.scm"); }
+/** Start a detatched garbage collection panel **/
+public static void gcMonitor() { js.evalOrLoad("elf/GCMonitor.scm"); }
 
-  /** Inspect the object, x using a JTable. **/
-  public static void inspect (Object x) { js.call("inspect", x); }
+/** Inspect the object, x using a JTable. **/
+public static void inspect(Object x) { js.call("inspect", x); }
 
-  /** Interact with, object it in an interactive JScheme window. **/
-  public static void interact (Object it) { new interact.Interactor(it); }
+/** Interact with, object it in an interactive JScheme window. **/
+public static void interact(Object it) { new interact.Interactor(it); }
 }
+
